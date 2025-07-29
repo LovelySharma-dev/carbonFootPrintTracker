@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carbon Calculator 
+
+  </title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-cover bg-center flex items-center justify-center text-white p-4" style="background-image: url('assets/images/background_min.jpg');">
+
+  <div class="w-full max-w-2xl bg-black/40 backdrop-blur-md p-6 rounded-xl shadow-xl">
+    <h1 class="text-3xl font-bold text-center mb-6">Carbon Footprint Calculator   </h1><img src="assets/images/icon3.png" alt="Background Image">
+    <form id="carbonForm" class="space-y-4">
+
+      <!-- Transport -->
+      <div>
+        <h2 class="text-xl font-semibold mb-2">🚗 Transportation</h2>
+        <input type="number" id="travel" placeholder="Car/Flight km/month" class="w-full p-2 rounded text-black"/>
+        <input type="number" id="fuel" placeholder="Fuel (litres/month)" class="w-full p-2 rounded mt-2 text-black"/>
+      </div>
+
+      <!-- Energy -->
+      <div>
+        <h2 class="text-xl font-semibold mt-4 mb-2">⚡ Energy</h2>
+        <input type="number" id="electricity" placeholder="Electricity (kWh/month)" class="w-full p-2 rounded text-black"/>
+      </div>
+
+      <!-- Waste -->
+      <div>
+        <h2 class="text-xl font-semibold mt-4 mb-2">🗑️ Waste</h2>
+        <input type="number" id="waste" placeholder="Waste (kg/month)" class="w-full p-2 rounded text-black"/>
+      </div>
+
+      <!-- Water -->
+      <div>
+        <h2 class="text-xl font-semibold mt-4 mb-2">💧 Water</h2>
+        <input type="number" id="water" placeholder="Water (litres/day)" class="w-full p-2 rounded text-black"/>
+      </div>
+      
+
+      <!-- Submit -->
+      <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 w-full py-2 rounded font-bold mt-4">Calculate</button>
+    </form>
+    <script>const data = {
+      timestamp: Date.now(),
+      total: total.toFixed(2),
+      categories: {
+        Travel: travelEmissions.toFixed(2),
+        Fuel: fuelEmissions.toFixed(2),
+        Electricity: electricityEmissions.toFixed(2),
+        Waste: wasteEmissions.toFixed(2),
+        Water: waterEmissions.toFixed(2),
+      },
+      trees: treesNeeded
+    };
+
+    const history = JSON.parse(localStorage.getItem('carbonHistory') || '[]');
+    history.unshift(data);
+    localStorage.setItem('carbonHistory', JSON.stringify(history.slice(0, 12)));</script>
+    <!-- Result -->
+    <div id="result" class="mt-6 hidden bg-white/10 p-4 rounded text-white text-center"></div>
+  </div>
+
+  <button onclick="window.location.href='dashboard.html'" class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+    📈 View Graph on Dashboard
+  </button>
+
+  <script>
+    document.getElementById('carbonForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const travelKm = parseFloat(document.getElementById('travel').value) || 0;
+      const fuelLitres = parseFloat(document.getElementById('fuel').value) || 0;
+      const electricityKwh = parseFloat(document.getElementById('electricity').value) || 0;
+      const wasteKg = parseFloat(document.getElementById('waste').value) || 0;
+      const waterLitres = parseFloat(document.getElementById('water').value) || 0;
+
+      const emissionFactors = {
+        travelPerKm: 0.21,
+        fuelPerLitre: 2.31,
+        electricityPerKwh: 0.92,
+        wastePerKg: 1.5,
+        waterPerLitre: 0.0003
+      };
+
+      const travelEmissions = travelKm * emissionFactors.travelPerKm;
+      const fuelEmissions = fuelLitres * emissionFactors.fuelPerLitre;
+      const electricityEmissions = electricityKwh * emissionFactors.electricityPerKwh;
+      const wasteEmissions = wasteKg * emissionFactors.wastePerKg;
+      const waterEmissions = waterLitres * 30 * emissionFactors.waterPerLitre; // daily to monthly
+
+      const total = travelEmissions + fuelEmissions + electricityEmissions + wasteEmissions + waterEmissions;
+      const treesNeeded = Math.ceil(total / 20); // 1 tree absorbs ~20kg/year
+      const avgIndia = 2500;
+
+      const tips = [
+        "🚴 Use public transport or bike more often.",
+        "🌱 Reduce meat & dairy consumption.",
+        "🔌 Unplug idle electronics.",
+        "♻️ Recycle more and avoid single-use plastic."
+      ];
+
+      const resultBox = document.getElementById('result');
+      resultBox.innerHTML = `
+        <div class="text-xl mb-2">🌍 Your monthly carbon footprint is <span class="text-green-300 font-bold">${total.toFixed(2)} kg CO₂</span></div>
+        <div class="mt-2">🌳 Trees to offset yearly: <strong>${treesNeeded}</strong></div>
+        <div class="mt-1">📊 India avg. per person: <strong>${avgIndia} kg/year</strong></div>
+        <hr class="my-3 border-white/30">
+        <div class="text-left">
+          <p class="font-semibold mb-1">✅ Tips to lower your footprint:</p>
+          <ul class="list-disc list-inside space-y-1">
+            ${tips.map(t => `<li>${t}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+      resultBox.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

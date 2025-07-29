@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF‑8" />
+  <meta name="viewport" content="width=device‑width, initial‑scale=1.0" />
+  <title>Carbon Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen bg-gray-100 p-4 text-gray-900">
+  <canvas id="carbonChart" width="400" height="200"></canvas>
+
+  <header class="text-3xl font-bold text-center mb-6">🌱 Carbon Dashboard</header>
+  <div class="max-w-3xl mx-auto space-y-8">
+
+    <!-- Chart Container -->
+    <canvas id="co2Chart" width="400" height="200" class="bg-white p-4 rounded shadow"></canvas>
+
+    <!-- History List -->
+    <div id="historyList" class="bg-white p-4 rounded shadow"></div>
+
+  </div>
+
+  <script>
+    const history = JSON.parse(localStorage.getItem('carbonHistory') || '[]');
+
+    // Chart: Total CO₂ over time
+    const ctx = document.getElementById('co2Chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Carbon Footprint (kg CO₂)',
+            data: dataPoints,
+            borderColor: 'green',
+            fill: false,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    // History list display
+    const listDiv = document.getElementById('historyList');
+    if (!history.length) {
+      listDiv.innerHTML = '<p>No past results yet.</p>';
+    } else {
+      listDiv.innerHTML = '<ul class="space-y-4">' +
+        history.map(h => `
+          <li class="border-b pb-2">
+            <div><strong>${new Date(h.timestamp).toLocaleString()}</strong></div>
+            <div>Total: ${h.total} kg CO₂, Trees: ${h.trees}</div>
+            <div class="text-sm text-gray-600 mt-1">
+              Breakdown:
+              ${Object.entries(h.categories).map(([cat, val]) => `<span>${cat}: ${val}kg</span>`).join(' • ')}
+            </div>
+          </li>
+        `).join('') +
+        '</ul>';
+    }
+  </script>
+</body>
+</html>
